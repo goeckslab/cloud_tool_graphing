@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools >= 63"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cloudtoolgrapher"
+description = "Build graphs from cloud job data"
+readme = "README.md"
+version = "0.0.1"
+requires-python = ">=3.8"
+dependencies = [
+  "plotly",
+  "boto3",
+  "pandas",
+]
+
+[project.scripts]
+cloudgrapher = "cloudtoolgrapher.cli:main"
+
+#[tool.setuptools.packages]
+#find = {}

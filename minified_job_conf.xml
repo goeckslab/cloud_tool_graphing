@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job_conf>
+  <destinations default_from_environ="GALAXY_DESTINATIONS_DEFAULT" default="docker_dispatch"><!-- was slurm_cluster -->
+    <!-- AWS BATCH -->
+    <destination id="aws_batch_auto" runner="aws_batch">
+      <!-- Fargate and non-GPU EC2 -->
+      <param id="vcpu">1</param>
+      <param id="memory">2048</param>
+    </destination>
+    <destination id="aws_batch_auto_low" runner="aws_batch">
+      <!-- Fargate and non-GPU EC2 -->
+      <param id="vcpu">1</param>
+      <param id="memory">8000</param>
+    </destination>
+    <destination id="aws_batch_auto_2xlow" runner="aws_batch">
+      <!-- Fargate and non-GPU EC2 -->
+      <param id="vcpu">4</param>
+      <param id="memory">16000</param>
+    </destination>	   
+    <destination id="aws_batch_auto_med" runner="aws_batch">
+      <!-- Fargate and non-GPU EC2 -->
+      <param id="vcpu">8</param>
+      <param id="memory">64000</param>
+    </destination>
+    <destination id="aws_batch_auto_high" runner="aws_batch">
+      <!-- Fargate and non-GPU EC2 -->
+      <param id="vcpu">12</param>
+      <param id="memory">128000</param>
+    </destination>
+    <destination id="aws_batch_auto_superhigh" runner="aws_batch">
+      <!-- Fargate and non-GPU EC2 -->
+      <param id="vcpu">24</param>
+      <param id="memory">478000</param>
+    </destination>
+    <destination id="aws_batch_gpu" runner="aws_batch">
+      <!-- Job queue must be built on GPU-specific compute environment -->
+      <param id="vcpu">4</param>
+      <param id="memory">20000</param>
+      <param id="gpu">1</param>
+    </destination>
+    <destination id="aws_batch_s3" runner="aws_batch">
+      <!-- Job queue must be built on a compute environment with S3 mounted EC2  -->
+      <param id="vcpu">1</param>
+      <param id="memory">20000</param>
+      <param id="ec2_host_volumes">/mnt/s3fs/galaxy-cancer,/etc/fstab</param>
+    </destination>
+    <!-- AWS ECS -->
+    <destination id="aws_ecs_dest" runner="aws_ecs">
+      <!-- Job queue must be built on a compute environment with S3 mounted EC2  -->
+      <param id="vcpu">1</param>
+      <param id="memory">2048</param>
+    </destination>
+    <destination id="aws_ecs_dest_med" runner="aws_ecs">
+      <!-- Job queue must be built on a compute environment with S3 mounted EC2  -->
+      <param id="vcpu">2</param>
+      <param id="memory">4096</param>
+    </destination>
+    <!-- Dynamic destination> -->
+    <destination id="aws_batch_entry" runner="dynamic">
+      <param id="type">python</param>
+      <param id="function">aws_batch_entry</param>
+    </destination>
+    <destination id="aws_batch_auto_0" runner="aws_batch">
+      <param id="vcpu">0.25</param>
+      <param id="memory">1024</param>
+      <resubmit condition="memory_limit_reached" destination="aws_batch_auto_1" />
+    </destination>
+    <destination id="aws_batch_auto_1" runner="aws_batch">
+      <param id="vcpu">0.5</param>
+      <param id="memory">2048</param>
+      <resubmit condition="memory_limit_reached" destination="aws_batch_auto_2" />
+    </destination>
+    <destination id="aws_batch_auto_2" runner="aws_batch">
+      <param id="vcpu">1</param>
+      <param id="memory">4096</param>
+      <resubmit condition="memory_limit_reached" destination="aws_batch_auto_3" />
+    </destination>
+    <destination id="aws_batch_auto_3" runner="aws_batch">
+      <param id="vcpu">2</param>
+      <param id="memory">8192</param>
+      <resubmit condition="memory_limit_reached" destination="aws_batch_auto_4" />
+    </destination>
+    <destination id="aws_batch_auto_4" runner="aws_batch">
+      <param id="vcpu">4</param>
+      <param id="memory">16368</param>
+      <resubmit condition="memory_limit_reached" destination="aws_batch_auto_5" />
+    </destination>
+    <destination id="aws_batch_auto_5" runner="aws_batch">
+      <param id="vcpu">4</param>
+      <param id="memory">30720</param>
+      <resubmit condition="memory_limit_reached" destination="aws_batch_auto_6" />
+    </destination>
+    <destination id="aws_batch_auto_6" runner="aws_batch">
+      <param id="vcpu">8</param>
+      <param id="memory">60000</param>
+      <resubmit condition="memory_limit_reached" destination="aws_batch_auto_7" />
+    </destination>
+    <destination id="aws_batch_auto_7" runner="aws_batch">
+      <param id="vcpu">16</param>
+      <param id="memory">120000</param>
+      <resubmit condition="memory_limit_reached" destination="aws_batch_auto_8" />
+    </destination>
+    <destination id="aws_batch_auto_8" runner="aws_batch">
+      <param id="vcpu">32</param>
+      <param id="memory">240000</param>
+    </destination>
+
+  </destinations>
+
+  <tools>
+    <!-- AWS Batch Fargate -->
+    <!--  -Multiplex -->
+    <tool id="rename_tiff_channels" destination="aws_batch_auto" />
+    <tool id="ashlar" destination="aws_batch_auto_high" />
+    <tool id="basic_illumination" destination="aws_batch_auto_med" />
+    <tool id="unet_coreograph" destination="aws_batch_auto_med" />
+    <tool id="naivestates" destination="aws_batch_auto" />
+    <tool id="quantification" destination="aws_batch_auto_med" />
+    <tool id="mesmer" destination="aws_batch_auto_superhigh" />
+    <tool id="s3segmenter" destination="aws_batch_auto_med" />
+    <tool id="unmicst" destination="aws_batch_auto_med" />      
+    <tool id="cp_segmentation" destination="aws_batch_auto_high" />      
+    <tool id="gate_finder" destination="aws_batch_auto" />
+    <tool id="scimap_mcmicro_to_anndata" destination="aws_batch_auto_2xlow" />
+    <tool id="scimap_phenotyping" destination="aws_batch_auto_2xlow" />
+    <tool id="scimap_spatial" destination="aws_batch_auto_low" />
+    <tool id="squidpy_spatial" destination="aws_batch_auto_low" />
+    <tool id="vitessce_spatial" destination="aws_batch_auto_med" />
+    <tool id="ip_convertimage" destination="aws_batch_auto_high" />
+    <!--  Machine Learning -->
+    <tool id="ludwig_evaluate" destination="aws_batch_entry" />
+    <tool id="ludwig_experiment" destination="aws_batch_entry" />
+    <tool id="ludwig_hyperopt" destination="aws_batch_entry" />
+    <tool id="ludwig_predict" destination="aws_batch_entry" />
+    <tool id="ludwig_render_config" destination="aws_batch_entry" />
+    <tool id="ludwig_train" destination="aws_batch_entry" />
+    <tool id="ludwig_visualize" destination="aws_batch_entry" />
+    <tool id="sklearn_estimator_attributes" destination="aws_batch_entry" />
+    <tool id="sklearn_feature_selection" destination="aws_batch_entry" />
+    <tool id="sklearn_fitted_model_eval" destination="aws_batch_entry" />
+    <tool id="keras_batch_models" destination="aws_batch_entry" />
+    <tool id="keras_image_deep_learning" destination="aws_batch_entry" />
+    <tool id="keras_model_builder" destination="aws_batch_entry" />
+    <tool id="keras_model_config" destination="aws_batch_entry" />
+    <tool id="keras_train_and_eval" destination="aws_batch_entry" />
+    <tool id="ml_visualization_ex" destination="aws_batch_entry" />
+    <tool id="model_prediction" destination="aws_batch_entry" />
+    <tool id="sklearn_model_validation" destination="aws_batch_entry" />
+    <tool id="sklearn_build_pipeline" destination="aws_batch_entry" />
+    <tool id="sklearn_searchcv" destination="aws_batch_entry" />
+    <tool id="stacking_ensemble_models" destination="aws_batch_entry" />
+    <tool id="sklearn_train_test_split" destination="aws_batch_entry" />
+    <tool id="interactive_tool_bam_iobio" destination="aws_ecs_dest_med" />
+    <tool id="interactive_tool_oncogene" destination="aws_ecs_dest_med" />
+    <tool id="interactive_tool_bam_iobio_ecr" destination="aws_ecs_dest_med" />
+    <tool id="interactive_tool_bam_iobio_ecr_public" destination="aws_ecs_dest_med" />
+    <tool id="timer" destination="aws_batch_auto" />
+  </tools>
+</job_conf>
+
+
